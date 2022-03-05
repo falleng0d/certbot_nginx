@@ -23,11 +23,34 @@
   package:
     name: "certbot={{ certbot_version }}"
     state: present
+  when: ansible_distribution_version < "21.00"
+
+- name: Install core
+  snap:
+    name: core
+  when: ansible_distribution_version >= "21.00"
+
+- name: snap refresh core
+  command: snap refresh core
+  when: ansible_distribution_version >= "21.00"
+
+- name: Install certbot
+  snap:
+    name: certbot
+    classic: yes
+  when: ansible_distribution_version >= "21.00"
 
 - name: Install certbot-nginx plugin
   package:
     name: "{{ certbot_nginx_name }}={{ certbot_nginx_version }}"
     state: present
+  when: ansible_distribution_version < "21.00"
+
+- name: Install certbot-nginx plugin
+  package:
+    name: "{{ certbot_nginx_name }}"
+    state: present
+  when: ansible_distribution_version >= "21.00"
 
 - import_tasks: certificate.yml
   when: domain_name is defined
